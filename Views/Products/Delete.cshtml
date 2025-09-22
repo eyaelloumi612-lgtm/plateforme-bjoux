@@ -1,0 +1,86 @@
+﻿@model JewelryManagementPlatform.Models.Product
+
+@{
+    ViewData["Title"] = "Supprimer le Produit";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-trash-alt me-2 text-danger"></i>@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Attention!</h4>
+    <p>Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="text-danger mb-4">Informations du Produit</h4>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Nom:</div>
+            <div class="col-sm-9">@Model.Nom</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Prix:</div>
+            <div class="col-sm-9">@Model.Prix.ToString("0.00") + " DT"</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Stock:</div>
+            <div class="col-sm-9">@Model.Stock unités</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Catégorie:</div>
+            <div class="col-sm-9">@Model.Categorie</div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-sm-3 fw-bold">Matière:</div>
+            <div class="col-sm-9">@Model.Matiere</div>
+        </div>
+
+        <form asp-action="Delete" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="alert alert-warning">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                    <label class="form-check-label fw-bold" for="confirmDelete">
+                        Je confirme vouloir supprimer définitivement ce produit
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
+                    <i class="fas fa-trash-alt me-1"></i>Supprimer définitivement
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Activer/désactiver le bouton de suppression
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            document.getElementById('deleteButton').disabled = !this.checked;
+        });
+
+        // Confirmation avant suppression
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!confirm('Êtes-vous absolument sûr de vouloir supprimer ce produit ? Cette action ne peut pas être annulée.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

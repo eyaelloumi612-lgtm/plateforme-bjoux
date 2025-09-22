@@ -1,0 +1,77 @@
+﻿@model JewelryManagementPlatform.Models.Commande
+@{
+    ViewData["Title"] = "Modifier la Commande";
+    var clients = ViewBag.Clients as SelectList ?? new SelectList(new List<object>());
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-edit me-2"></i>@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ClientId" class="form-label">Client</label>
+                    <select asp-for="ClientId" asp-items="clients" class="form-select" required>
+                        <option value="">Sélectionner un client</option>
+                    </select>
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Statut" class="form-label">Statut</label>
+                    <select asp-for="Statut" class="form-select">
+                        <option value="En attente">En attente</option>
+                        <option value="Confirmée">Confirmée</option>
+                        <option value="Expédiée">Expédiée</option>
+                        <option value="Livrée">Livrée</option>
+                        <option value="Annulée">Annulée</option>
+                    </select>
+                    <span asp-validation-for="Statut" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateCommande" class="form-label">Date de commande</label>
+                    <input asp-for="DateCommande" class="form-control" readonly />
+                    <span asp-validation-for="DateCommande" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Total" class="form-label">Total</label>
+                    <div class="input-group">
+                        <input asp-for="Total" class="form-control" readonly />
+                        <span class="input-group-text">DT</span>
+                    </div>
+                    <span asp-validation-for="Total" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Enregistrer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

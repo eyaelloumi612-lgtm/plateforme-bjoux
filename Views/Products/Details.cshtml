@@ -1,0 +1,100 @@
+﻿@model JewelryManagementPlatform.Models.Product
+
+@{
+    ViewData["Title"] = "Détails du Produit";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-info-circle me-2"></i>@ViewData["Title"]</h1>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+            <i class="fas fa-edit me-1"></i>Modifier
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4 class="text-primary mb-4">Informations du Produit</h4>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Nom:</div>
+                    <div class="col-sm-9">@Model.Nom</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Description:</div>
+                    <div class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "Non renseignée" : Model.Description)</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Prix:</div>
+                    <div class="col-sm-9">@Model.Prix.ToString("0.00") + " DT"</div>
+
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Stock:</div>
+                    <div class="col-sm-9">
+                        <span class="@(Model.Stock == 0 ? "text-danger fw-bold" : Model.Stock < 5 ? "text-warning" : "text-success")">
+                            @Model.Stock unités
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Catégorie:</div>
+                    <div class="col-sm-9">@(string.IsNullOrEmpty(Model.Categorie) ? "Non renseignée" : Model.Categorie)</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Matière:</div>
+                    <div class="col-sm-9">@(string.IsNullOrEmpty(Model.Matiere) ? "Non renseignée" : Model.Matiere)</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Image:</div>
+                    <div class="col-sm-9">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="@Model.Nom" class="img-thumbnail" style="max-height: 200px;">
+                        }
+                        else
+                        {
+                            <span class="text-muted">Aucune image</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <i class="fas fa-gem fa-4x text-primary mb-3"></i>
+                        <h5>Statistiques</h5>
+                        <div class="mt-3">
+                            <span class="badge bg-@(Model.Stock > 0 ? "success" : "danger")">
+                                @(Model.Stock > 0 ? "En stock" : "Rupture")
+                            </span>
+                            @if (Model.Stock > 0 && Model.Stock < 5)
+                            {
+                                <span class="badge bg-warning ms-1">Stock faible</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>

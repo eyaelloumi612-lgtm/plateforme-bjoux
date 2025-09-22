@@ -1,0 +1,64 @@
+﻿@model JewelryManagementPlatform.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h3>@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" id="loginForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- CHAMP CACHÉ POUR RETURNURL - ESSENTIEL -->
+                    <input type="hidden" asp-for="ReturnUrl" value="@Model.ReturnUrl" />
+
+                    <!-- AFFICHER LES ERREURS -->
+                    @if (ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" value="admin@bijoux.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Mot de passe</label>
+                        <input asp-for="Password" type="password" class="form-control" value="Admin123!" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label">Se souvenir de moi</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Debug
+        console.log("ReturnUrl value:", "@Model.ReturnUrl");
+    </script>
+}

@@ -1,0 +1,114 @@
+﻿@model JewelryManagementPlatform.Models.Commande
+
+@{
+    ViewData["Title"] = "Supprimer la Commande";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-trash-alt me-2 text-danger"></i>@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Attention!</h4>
+    <p>Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="text-danger mb-4">Informations de la Commande</h4>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Référence:</div>
+            <div class="col-sm-9">@Model.Reference</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Client:</div>
+            <div class="col-sm-9">@Model.Client?.NomComplet</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Date:</div>
+            <div class="col-sm-9">@Model.DateCommande.ToString("dd/MM/yyyy")</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">Statut:</div>
+            <div class="col-sm-9">@Model.Statut</div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-sm-3 fw-bold">Total:</div>
+            <div class="col-sm-9">@Model.Total.ToString("0.00") DT</div>
+        </div>
+
+        <!-- CORRECTION : Vérification si LignesCommande est null -->
+        @if (Model.LignesCommande != null && Model.LignesCommande.Any())
+        {
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-info-circle me-2"></i>Produits inclus:</h6>
+                <ul>
+                    @{
+                        // Prendre maximum 3 produits pour l'affichage
+                        var produitsAffiches = Model.LignesCommande.Take(3).ToList();
+                    }
+                    @foreach (var ligne in produitsAffiches)
+                    {
+                        <li>@ligne.Product?.Nom - @ligne.Quantite x @ligne.PrixUnitaire.ToString("0.00") DT</li>
+                    }
+                    @if (Model.LignesCommande.Count > 3)
+                    {
+                        <li>... et @(Model.LignesCommande.Count - 3) autres produits</li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle me-2"></i>Aucun produit dans cette commande</h6>
+            </div>
+        }
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="alert alert-warning">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                    <label class="form-check-label fw-bold" for="confirmDelete">
+                        Je confirme vouloir supprimer définitivement cette commande
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
+                    <i class="fas fa-trash-alt me-1"></i>Supprimer définitivement
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Activer/désactiver le bouton de suppression
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            document.getElementById('deleteButton').disabled = !this.checked;
+        });
+
+        // Confirmation avant suppression
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!confirm('Êtes-vous absolument sûr de vouloir supprimer cette commande ? Tous les produits associés seront également supprimés.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

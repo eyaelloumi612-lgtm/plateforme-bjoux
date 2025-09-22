@@ -1,0 +1,120 @@
+﻿@model JewelryManagementPlatform.Models.Product
+
+@{
+    ViewData["Title"] = "Modifier le Produit";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-edit me-2"></i>@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nom" class="form-label"></label>
+                    <input asp-for="Nom" class="form-control" required />
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Prix" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Prix" type="number" step="0.01" class="form-control" required />
+                        <span class="input-group-text">DT</span>
+                    </div>
+                    <span asp-validation-for="Prix" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Stock" class="form-label"></label>
+                    <input asp-for="Stock" type="number" class="form-control" required />
+                    <span asp-validation-for="Stock" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Categorie" class="form-label"></label>
+                    <select asp-for="Categorie" class="form-select">
+                        <option value="">Sélectionner une catégorie</option>
+                        <option value="Bagues">Bagues</option>
+                        <option value="Colliers">Colliers</option>
+                        <option value="Bracelets">Bracelets</option>
+                        <option value="Boucles d'oreilles">Boucles d'oreilles</option>
+                        <option value="Montres">Montres</option>
+                        <option value="Pendentifs">Pendentifs</option>
+                    </select>
+                    <span asp-validation-for="Categorie" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Matiere" class="form-label"></label>
+                    <select asp-for="Matiere" class="form-select">
+                        <option value="">Sélectionner une matière</option>
+                        <option value="Or">Or</option>
+                        <option value="Argent">Argent</option>
+                        <option value="Platine">Platine</option>
+                        <option value="Acier">Acier inoxydable</option>
+                        <option value="Cuir">Cuir</option>
+                    </select>
+                    <span asp-validation-for="Matiere" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ImageUrl" class="form-label"></label>
+                    <input asp-for="ImageUrl" type="url" class="form-control" placeholder="https://exemple.com/image.jpg" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Description détaillée du produit..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Enregistrer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Validation côté client
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}

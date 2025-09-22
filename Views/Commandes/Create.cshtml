@@ -1,0 +1,231 @@
+﻿@{
+    ViewData["Title"] = "Créer une Commande";
+    var clients = ViewBag.Clients as SelectList ?? new SelectList(new List<object>());
+    var products = ViewBag.Products as SelectList ?? new SelectList(new List<object>());
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-plus-circle me-2"></i>@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+    </a>
+</div>
+
+<!-- MESSAGES D'ALERTE -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="/Commandes/Create" id="commandeForm">
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Client *</label>
+                    <select name="ClientId" class="form-select" required>
+                        <option value="">Sélectionner un client</option>
+                        @foreach (var item in clients)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Statut</label>
+                    <select name="Statut" class="form-select">
+                        <option value="En attente">En attente</option>
+                        <option value="Confirmée">Confirmée</option>
+                        <option value="Expédiée">Expédiée</option>
+                        <option value="Livrée">Livrée</option>
+                        <option value="Annulée">Annulée</option>
+                    </select>
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3">Produits de la commande</h5>
+
+            <div id="produitsContainer">
+                <!-- Produits seront ajoutés ici dynamiquement -->
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="addProduit()">
+                <i class="fas fa-plus me-1"></i>Ajouter un produit
+            </button>
+
+            <div class="row mt-4">
+                <div class="col-md-4 offset-md-8">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Total de la commande</h6>
+                            <h4 id="totalCommande" class="text-primary">0,00 DT</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="submit" class="btn btn-primary" id="submitButton">
+                    <i class="fas fa-save me-1"></i>Créer la commande
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </a>
+            </div>
+
+            <input type="hidden" name="productIds" id="productIds" value="" />
+            <input type="hidden" name="quantities" id="quantities" value="" />
+        </form>
+    </div>
+</div>
+
+<!-- TEMPLATE POUR UN PRODUIT -->
+<!-- TEMPLATE POUR UN PRODUIT -->
+<template id="produitTemplate">
+    <div class="produit-row row mb-3">
+        <div class="col-md-5">
+            <label class="form-label">Produit</label>
+            <select class="form-select produit-select" onchange="updateProduct(this)">
+                <option value="">Sélectionner un produit</option>
+                @foreach (var item in products)
+                {
+                    // Extraire le prix du texte (format: "Nom - PrixDT")
+                    var productText = item.Text.ToString();
+                    var price = 0m;
+                    if (productText.Contains("-") && productText.Contains("DT"))
+                    {
+                        var pricePart = productText.Split('-').Last().Replace("DT", "").Trim();
+                        decimal.TryParse(pricePart, out price);
+                    }
+
+                    <option value="@item.Value" data-prix="@price">
+                        @item.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Quantité</label>
+            <input type="number" class="form-control quantity" value="1" min="1" onchange="updateQuantity(this)">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Prix unitaire</label>
+            <input type="text" class="form-control price" readonly value="0,00 DT">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeProduit(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        let produits = [];
+
+        // Ajouter un produit
+        function addProduit() {
+            const template = document.getElementById('produitTemplate');
+            const clone = template.content.cloneNode(true);
+            document.getElementById('produitsContainer').appendChild(clone);
+            updateHiddenFields();
+        }
+
+        // Supprimer un produit
+        function removeProduit(button) {
+            const row = button.closest('.produit-row');
+            if (document.querySelectorAll('.produit-row').length > 1) {
+                row.remove();
+                updateHiddenFields();
+                calculateTotal();
+            }
+        }
+
+        // Mettre à jour les champs cachés
+        function updateHiddenFields() {
+            const productIds = [];
+            const quantities = [];
+
+            document.querySelectorAll('.produit-row').forEach(row => {
+                const select = row.querySelector('.produit-select');
+                const quantity = row.querySelector('.quantity');
+
+                if (select.value) {
+                    productIds.push(select.value);
+                    quantities.push(quantity.value);
+                }
+            });
+
+            document.getElementById('productIds').value = productIds.join(',');
+            document.getElementById('quantities').value = quantities.join(',');
+        }
+
+        // Calculer le total
+        function calculateTotal() {
+            let total = 0;
+
+            document.querySelectorAll('.produit-row').forEach(row => {
+                const select = row.querySelector('.produit-select');
+                const quantity = parseInt(row.querySelector('.quantity').value) || 0;
+
+                if (select.value && quantity > 0) {
+                    const price = parseFloat(select.selectedOptions[0].dataset.prix) || 0;
+                    total += price * quantity;
+                }
+            });
+
+            document.getElementById('totalCommande').textContent = total.toFixed(2) + ' DT';
+        }
+
+        // Mettre à jour le produit
+        function updateProduct(select) {
+            const price = select.selectedOptions[0]?.dataset.prix || '0';
+            select.closest('.produit-row').querySelector('.price').value = parseFloat(price).toFixed(2) + ' DT';
+            updateHiddenFields();
+            calculateTotal();
+        }
+
+        // Mettre à jour la quantité
+        function updateQuantity(input) {
+            updateHiddenFields();
+            calculateTotal();
+        }
+
+        // Validation avant soumission
+        document.getElementById('commandeForm').addEventListener('submit', function(e) {
+            const clientId = document.querySelector('select[name="ClientId"]').value;
+            const productIds = document.getElementById('productIds').value;
+
+            if (!clientId) {
+                e.preventDefault();
+                alert('Veuillez sélectionner un client');
+                return false;
+            }
+
+            if (!productIds) {
+                e.preventDefault();
+                alert('Veuillez ajouter au moins un produit');
+                return false;
+            }
+
+            return true;
+        });
+
+        // Ajouter un produit initial au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            addProduit();
+        });
+    </script>
+}
